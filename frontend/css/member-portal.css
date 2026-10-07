@@ -1,0 +1,644 @@
+/* ============================================================
+   MEMBER PORTAL
+   ============================================================ */
+
+.member-sidebar {
+    background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+
+.member-logo {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Welcome banner */
+.welcome-banner {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    padding: 30px;
+    border-radius: 16px;
+    color: white;
+    margin-bottom: 25px;
+    box-shadow: 0 15px 35px -10px rgba(59, 130, 246, 0.4);
+    animation: fadeIn 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.welcome-banner .avatar-lg {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.welcome-banner h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.welcome-banner p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Stats grid */
+.member-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.member-stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.5s ease-out backwards;
+}
+
+.member-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.member-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.member-stat-card:nth-child(3) { animation-delay: 0.15s; }
+
+.stat-circle {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-info h3 {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-info .stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -1px;
+}
+
+/* Book cards grid for browsing */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.book-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s;
+    animation: fadeIn 0.4s ease-out backwards;
+    border-left: 4px solid #3b82f6;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.15);
+}
+
+.book-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.book-card .book-author {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.book-card .book-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.book-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.book-availability {
+    font-size: 12px;
+    font-weight: 700;
+    color: #16a34a;
+    margin-bottom: 4px;
+}
+
+.book-availability.low {
+    color: #f59e0b;
+}
+
+.book-availability.out {
+    color: #ef4444;
+}
+
+/* History and fines table styling */
+.history-table,
+.fines-table {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    border-collapse: collapse;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.history-table th,
+.fines-table th {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.history-table td,
+.fines-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #334155;
+}
+
+.history-table tr:hover,
+.fines-table tr:hover {
+    background: #f8fafc;
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pill.borrowed { background: #dbeafe; color: #1e40af; }
+.status-pill.overdue { background: #fee2e2; color: #991b1b; }
+.status-pill.returned { background: #dcfce7; color: #166534; }
+.status-pill.unpaid { background: #fee2e2; color: #991b1b; }
+.status-pill.paid { background: #dcfce7; color: #166534; }
+
+/* Empty states */
+.portal-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.portal-empty svg {
+    color: #cbd5e1;
+    margin-bottom: 15px;
+}
+
+.portal-empty h3 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.portal-empty p {
+    font-size: 13px;
+}
+
+/* Section titles */
+.portal-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.portal-section-title svg {
+    color: #3b82f6;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .member-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+    }
+    .books-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================================
+   RESERVATIONS — Member Portal
+   ============================================================ */
+
+/* Reserve button on book cards */
+.btn-reserve {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: auto;
+    width: 100%;
+    box-shadow: 0 6px 15px -3px rgba(59, 130, 246, 0.4);
+}
+
+.btn-reserve:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -3px rgba(59, 130, 246, 0.6);
+}
+
+.btn-reserve:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-reserve:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Reserve Modal */
+.reserve-modal {
+    max-width: 460px !important;
+    overflow: visible !important;
+}
+
+.reserve-modal .modal-header {
+    flex-direction: column;
+    padding: 30px 30px 20px;
+    border-bottom: none;
+    position: relative;
+    text-align: center;
+}
+
+.reserve-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.reserve-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+    animation: pulse-reserve 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-reserve {
+    0%, 100% {
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.7);
+    }
+}
+
+.reserve-modal .modal-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.reserve-modal .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.reserve-modal .modal-body {
+    padding: 0 30px 30px;
+}
+
+/* Book info box */
+.reserve-book-info {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-left: 4px solid #3b82f6;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.reserve-book-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+}
+
+.reserve-book-author {
+    font-size: 13px;
+    color: #475569;
+}
+
+.reserve-subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* Form fields in modal */
+.reserve-modal .form-group {
+    margin-bottom: 18px;
+}
+
+.reserve-modal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reserve-modal .form-group input,
+.reserve-modal .form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #f8fafc;
+    color: #0f172a;
+    transition: all 0.3s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.reserve-modal .form-group input:focus,
+.reserve-modal .form-group textarea:focus {
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.reserve-modal .form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+    font-family: inherit;
+}
+
+.reserve-submit {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    margin-top: 10px;
+}
+
+/* Reservation cards */
+.reservations-list {
+    display: grid;
+    gap: 16px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.reservation-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid #f59e0b;
+    transition: all 0.25s;
+    animation: fadeIn 0.4s ease-out backwards;
+}
+
+.reservation-card:nth-child(1) { animation-delay: 0.05s; }
+.reservation-card:nth-child(2) { animation-delay: 0.1s; }
+.reservation-card:nth-child(3) { animation-delay: 0.15s; }
+
+.reservation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px -10px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-card.pending { border-left-color: #f59e0b; }
+.reservation-card.ready { border-left-color: #10b981; }
+.reservation-card.completed { border-left-color: #3b82f6; opacity: 0.85; }
+.reservation-card.cancelled { border-left-color: #94a3b8; opacity: 0.7; }
+
+.reservation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.reservation-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+}
+
+.reservation-author {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.reservation-status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.reservation-status.pending { background: #fef3c7; color: #92400e; }
+.reservation-status.ready { background: #dcfce7; color: #166534; }
+.reservation-status.completed { background: #dbeafe; color: #1e40af; }
+.reservation-status.cancelled { background: #f1f5f9; color: #64748b; }
+
+.reservation-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.reservation-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #334155;
+}
+
+.reservation-detail svg {
+    color: #94a3b8;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.reservation-detail strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.reservation-notes {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #475569;
+    font-style: italic;
+    margin-bottom: 12px;
+}
+
+.reservation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-cancel-reservation {
+    padding: 9px 16px;
+    background: #f1f5f9;
+    color: #dc2626;
+    border: 1px solid #fee2e2;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-reservation:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* Empty state */
+.reservations-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.reservations-empty svg {
+    color: #cbd5e1;
+    margin-bottom: 15px;
+}
+
+.reservations-empty h3 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.reservations-empty p {
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .reserve-modal .modal-body {
+        padding: 0 20px 20px;
+    }
+
+    .reserve-modal .modal-header {
+        padding: 25px 20px 15px;
+    }
+
+    .reserve-icon {
+        width: 55px;
+        height: 55px;
+    }
+
+    .reserve-modal .modal-header h2 {
+        font-size: 19px;
+    }
+
+    .reservation-details {
+        gap: 10px;
+    }
+}

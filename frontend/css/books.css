@@ -1,0 +1,938 @@
+/* ============================================================
+   BOOKS PAGE STYLES
+   (extends dashboard.css)
+   ============================================================ */
+
+/* ============================================================
+   PAGE HEADER WITH BUTTON
+   ============================================================ */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 8px 20px -5px rgba(20, 184, 166, 0.5);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px -5px rgba(20, 184, 166, 0.6);
+}
+
+.btn-secondary {
+    padding: 12px 20px;
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 4px 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.search-bar:focus-within {
+    border-color: #14b8a6;
+}
+
+.search-bar svg {
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    color: #0f172a;
+}
+
+.search-bar input::placeholder {
+    color: #94a3b8;
+}
+
+.btn-clear {
+    background: #e2e8f0;
+    color: #64748b;
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-clear:hover {
+    background: #cbd5e1;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.table-container {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+}
+
+.data-table th {
+    color: white;
+    text-align: left;
+    padding: 15px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.data-table td {
+    padding: 15px 18px;
+    font-size: 14px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-table tbody tr {
+    transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table .loading {
+    text-align: center;
+    color: #94a3b8;
+    padding: 40px;
+    font-style: italic;
+}
+
+.data-table .empty {
+    text-align: center;
+    color: #94a3b8;
+    padding: 40px;
+    font-style: italic;
+}
+
+.available-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.available-badge.ok {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.available-badge.low {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.available-badge.out {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ============================================================
+   ACTION BUTTONS
+   ============================================================ */
+.actions-cell {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-edit:hover {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-delete:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.2s;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 28px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: #94a3b8;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.modal form {
+    padding: 24px 28px 28px;
+}
+
+.form-row {
+    margin-bottom: 16px;
+}
+
+.form-row.two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #f8fafc;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #14b8a6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 10px;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 14px 22px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.3);
+    animation: slideInRight 0.3s ease-out;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+    .data-table {
+        font-size: 12px;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 12px 10px;
+    }
+    .form-row.two-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ============================================================
+   MODERN BOOK CARDS VIEW
+   ============================================================ */
+
+/* Books Toolbar */
+.books-toolbar {
+    background: white;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.books-toolbar .search-bar {
+    flex: 1;
+    min-width: 250px;
+    margin-bottom: 0;
+}
+
+.toolbar-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 10px 34px 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    min-width: 150px;
+}
+
+.filter-select:hover {
+    border-color: #3b82f6;
+    background-color: white;
+}
+
+.filter-select:focus {
+    border-color: #3b82f6;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* View toggle buttons */
+.view-toggle {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.view-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.view-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.view-btn.active {
+    background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+    color: white;
+    box-shadow: 0 4px 10px -2px rgba(20, 184, 166, 0.5);
+}
+
+/* Books container */
+.books-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.books-container.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.books-container.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ============================================================
+   BOOK CARD (Grid View)
+   ============================================================ */
+
+.book-card-modern {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.4s ease-out backwards;
+}
+
+.book-card-modern:nth-child(1) { animation-delay: 0.03s; }
+.book-card-modern:nth-child(2) { animation-delay: 0.06s; }
+.book-card-modern:nth-child(3) { animation-delay: 0.09s; }
+.book-card-modern:nth-child(4) { animation-delay: 0.12s; }
+.book-card-modern:nth-child(5) { animation-delay: 0.15s; }
+.book-card-modern:nth-child(6) { animation-delay: 0.18s; }
+
+.book-card-modern:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Book cover (colored by genre) */
+.book-cover {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+}
+
+.book-cover svg {
+    width: 60px;
+    height: 60px;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+}
+
+/* Genre-based cover gradients */
+.book-cover.fantasy {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+.book-cover.mystery {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+.book-cover.horror {
+    background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+}
+.book-cover.fiction {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+.book-cover.science {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+}
+.book-cover.romance {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+}
+.book-cover.history {
+    background: linear-gradient(135deg, #a16207 0%, #713f12 100%);
+}
+.book-cover.default {
+    background: linear-gradient(135deg, #64748b 0%, #334155 100%);
+}
+
+/* Availability badge on cover */
+.book-availability-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.book-availability-badge.ok {
+    color: #166534;
+}
+
+.book-availability-badge.low {
+    color: #92400e;
+}
+
+.book-availability-badge.out {
+    color: #991b1b;
+}
+
+/* Book info section */
+.book-info-modern {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.book-title-modern {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 38px;
+}
+
+.book-author-modern {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.book-meta-modern {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.genre-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.genre-tag.fantasy { background: #ede9fe; color: #6d28d9; }
+.genre-tag.mystery { background: #fef3c7; color: #92400e; }
+.genre-tag.horror { background: #fee2e2; color: #991b1b; }
+.genre-tag.fiction { background: #dbeafe; color: #1e40af; }
+.genre-tag.science { background: #d1fae5; color: #065f46; }
+.genre-tag.romance { background: #fce7f3; color: #9d174d; }
+.genre-tag.history { background: #fef9c3; color: #854d0e; }
+.genre-tag.default { background: #f1f5f9; color: #475569; }
+
+.year-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* Book actions */
+.book-actions-modern {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.btn-book-action {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-book-edit {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.btn-book-edit:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-book-delete {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.btn-book-delete:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ============================================================
+   BOOK LIST VIEW (Table-like)
+   ============================================================ */
+
+.book-list-item {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s;
+    animation: fadeIn 0.3s ease-out backwards;
+    border-left: 4px solid #14b8a6;
+}
+
+.book-list-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.15);
+}
+
+.book-list-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.book-list-cover.fantasy { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.book-list-cover.mystery { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.book-list-cover.horror { background: linear-gradient(135deg, #ef4444, #991b1b); }
+.book-list-cover.fiction { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+.book-list-cover.science { background: linear-gradient(135deg, #10b981, #047857); }
+.book-list-cover.romance { background: linear-gradient(135deg, #ec4899, #be185d); }
+.book-list-cover.history { background: linear-gradient(135deg, #a16207, #713f12); }
+.book-list-cover.default { background: linear-gradient(135deg, #64748b, #334155); }
+
+.book-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.book-list-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-list-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.book-list-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.book-list-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.book-list-actions .btn-book-action {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+/* ============================================================
+   EMPTY STATE / LOADING
+   ============================================================ */
+
+.loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+    font-size: 14px;
+    grid-column: 1 / -1;
+}
+
+.books-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: #94a3b8;
+    grid-column: 1 / -1;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.books-empty svg {
+    color: #cbd5e1;
+    margin-bottom: 15px;
+}
+
+.books-empty h3 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.books-empty p {
+    font-size: 13px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .books-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .books-toolbar .search-bar {
+        min-width: 100%;
+    }
+
+    .toolbar-controls {
+        justify-content: space-between;
+    }
+
+    .filter-select {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .books-container.grid-view {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+    }
+
+    .book-cover {
+        height: 110px;
+    }
+
+    .book-cover svg {
+        width: 45px;
+        height: 45px;
+    }
+
+    .book-title-modern {
+        font-size: 13px;
+        min-height: 34px;
+    }
+
+    .book-list-item {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .book-list-cover {
+        width: 40px;
+        height: 40px;
+    }
+
+    .book-list-title {
+        font-size: 13px;
+    }
+
+    .book-list-subtitle {
+        font-size: 11px;
+    }
+}

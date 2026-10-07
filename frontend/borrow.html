@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow / Return - Library Management System</title>
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/books.css">
+    <link rel="stylesheet" href="/css/borrow.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <h2>Library</h2>
+                <span>Management</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="/books" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Books</span>
+            </a>
+            <a href="/members" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Members</span>
+            </a>
+            <a href="/borrow" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                <span>Borrow / Return</span>
+            </a>
+            <a href="/admin/reservations" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><polyline points="8 15 11 18 16 13"></polyline></svg>
+                <span>Reservations</span>
+                <span class="badge" id="pendingReservationsBadge" style="display:none;">0</span>
+            </a>
+            <a href="/fines" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="6" x2="12" y2="18"></line></svg>
+                <span>Fines</span>
+            </a>
+            <a href="/reports" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <span>Reports</span>
+            </a>
+            <a href="/admin/approvals" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+                <span>Approvals</span>
+                <span class="badge" id="pendingCount" style="display:none;">0</span>
+            </a>
+        </nav>
+
+        <button class="logout-btn" onclick="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Logout
+        </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="page-header">
+            <div>
+                <h1>Borrow / Return</h1>
+                <p>Process book loans and returns</p>
+            </div>
+        </header>
+
+        <!-- TWO PANELS -->
+        <div class="borrow-grid">
+
+            <!-- BORROW PANEL -->
+            <div class="panel borrow-panel">
+                <div class="panel-header">
+                    <div class="panel-icon" style="background: linear-gradient(135deg, #14b8a6, #0ea5e9);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </div>
+                    <div>
+                        <h2>Borrow a Book</h2>
+                        <p>Hand out a book to a member</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- MEMBER ID WITH SEARCH -->
+                    <div class="form-group">
+                        <label>Member ID</label>
+                        <div class="input-with-search">
+                            <input type="number" id="borrowMemberId" placeholder="e.g., 1" min="1">
+                            <button type="button" class="btn-search-inline" onclick="openMemberSearch()" title="Search Member">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <small id="memberInfo" class="field-hint"></small>
+                    </div>
+
+                    <!-- BOOK ID WITH SEARCH -->
+                    <div class="form-group">
+                        <label>Book ID</label>
+                        <div class="input-with-search">
+                            <input type="number" id="borrowBookId" placeholder="e.g., 3" min="1">
+                            <button type="button" class="btn-search-inline" onclick="openBookSearch()" title="Search Book">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <small id="bookInfo" class="field-hint"></small>
+                    </div>
+
+                    <div class="info-box" id="borrowPreview" style="display:none;">
+                        <div class="info-row">
+                            <span>Member:</span>
+                            <strong id="previewMember">—</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Book:</span>
+                            <strong id="previewBook">—</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Borrow Date:</span>
+                            <strong id="previewBorrowDate">—</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Due Date:</span>
+                            <strong id="previewDueDate">—</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary btn-full" onclick="processBorrow()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                        BORROW BOOK
+                    </button>
+                </div>
+            </div>
+
+            <!-- RETURN PANEL -->
+            <div class="panel return-panel">
+                <div class="panel-header">
+                    <div class="panel-icon" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    </div>
+                    <div>
+                        <h2>Return a Book</h2>
+                        <p>Process a book return</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- TID WITH SEARCH -->
+                    <div class="form-group">
+                        <label>Transaction ID (TID)</label>
+                        <div class="input-with-search">
+                            <input type="number" id="returnTransactionId" placeholder="See table below" min="1">
+                            <button type="button" class="btn-search-inline btn-search-warning" onclick="openTidSearch()" title="Search Active Borrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <small class="field-hint">Enter the TID from the Active Borrows table</small>
+                    </div>
+
+                    <div class="info-box" id="returnPreview" style="display:none;">
+                        <div class="info-row">
+                            <span>Member:</span>
+                            <strong id="returnMember">—</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Book:</span>
+                            <strong id="returnBook">—</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Due Date:</span>
+                            <strong id="returnDueDate">—</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary btn-full btn-warning" onclick="processReturn()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                        RETURN BOOK
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTIVE BORROWS -->
+        <section class="active-section">
+            <div class="section-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    Active Borrows
+                </h2>
+                <button class="btn-secondary btn-small" onclick="loadTransactions()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>TID</th>
+                            <th>Member</th>
+                            <th>Book</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <tr><td colspan="6" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SEARCH MODAL — MEMBER -->
+    <div class="modal-overlay" id="memberSearchModal">
+        <div class="modal search-modal">
+            <div class="modal-header">
+                <div class="search-modal-header">
+                    <div class="search-icon-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 0 1 7.75"></path>
+                        </svg>
+                    </div>
+                    <h2>Find a Member</h2>
+                </div>
+                <button class="modal-close" onclick="closeMemberSearch()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="memberSearchInput" placeholder="Search by name, email, or contact..." autocomplete="off">
+                </div>
+                <div class="search-results" id="memberSearchResults">
+                    <div class="search-empty">Loading members...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH MODAL — BOOK -->
+    <div class="modal-overlay" id="bookSearchModal">
+        <div class="modal search-modal">
+            <div class="modal-header">
+                <div class="search-modal-header">
+                    <div class="search-icon-circle" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
+                    <h2>Find a Book</h2>
+                </div>
+                <button class="modal-close" onclick="closeBookSearch()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="bookSearchInput" placeholder="Search by title, author, ISBN, or genre..." autocomplete="off">
+                </div>
+                <div class="search-results" id="bookSearchResults">
+                    <div class="search-empty">Loading books...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH MODAL — TID -->
+    <div class="modal-overlay" id="tidSearchModal">
+        <div class="modal search-modal">
+            <div class="modal-header">
+                <div class="search-modal-header">
+                    <div class="search-icon-circle" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                    </div>
+                    <h2>Find Active Borrow</h2>
+                </div>
+                <button class="modal-close" onclick="closeTidSearch()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="tidSearchInput" placeholder="Search by member or book title..." autocomplete="off">
+                </div>
+                <div class="search-results" id="tidSearchResults">
+                    <div class="search-empty">Loading active borrows...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/approvals-badge.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/borrow.js"></script>
+</body>
+</html>

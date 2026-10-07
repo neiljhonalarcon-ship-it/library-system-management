@@ -1,0 +1,225 @@
+/* ============================================================
+   FINES PAGE STYLES
+   ============================================================ */
+
+/* Stats cards grid */
+.fines-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.fines-stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeIn 0.5s ease-out backwards;
+}
+
+.fines-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.fines-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.fines-stat-card:nth-child(3) { animation-delay: 0.15s; }
+.fines-stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+.fines-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.fines-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.fines-stat-label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.fines-stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+/* Section title */
+.section-title {
+    margin-bottom: 15px;
+}
+
+.section-title h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.section-title svg {
+    color: #f59e0b;
+}
+
+/* Days badge */
+.days-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Amount cell */
+.amount-cell {
+    font-weight: 800;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+/* Rate cell */
+.rate-cell {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Member cell */
+.member-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.member-avatar.student {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.member-avatar.faculty {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+}
+
+.member-avatar.community {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Pay button */
+.btn-pay {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px -3px rgba(16, 185, 129, 0.5);
+}
+
+.btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -3px rgba(16, 185, 129, 0.6);
+}
+
+/* Empty state */
+.empty-state-fines {
+    text-align: center;
+    padding: 50px 20px;
+    color: #94a3b8;
+}
+
+.empty-state-fines svg {
+    color: #10b981;
+    margin-bottom: 12px;
+}
+
+.empty-state-fines h3 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+/* Total outstanding banner */
+.total-outstanding {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    padding: 22px 28px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 12px 25px -8px rgba(239, 68, 68, 0.5);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.total-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.total-sublabel {
+    display: block;
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.total-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .fines-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .fines-stats {
+        grid-template-columns: 1fr;
+    }
+    .total-outstanding {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+}

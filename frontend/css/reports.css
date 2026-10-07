@@ -1,0 +1,297 @@
+/* ============================================================
+   REPORTS PAGE STYLES
+   ============================================================ */
+
+/* Tab buttons */
+.report-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    width: fit-content;
+    flex-wrap: wrap;
+}
+
+.report-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.report-tab:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.report-tab.active {
+    background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+    color: white;
+    box-shadow: 0 4px 12px -2px rgba(20, 184, 166, 0.5);
+}
+
+/* Report card wrapper */
+.report-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.report-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.report-card h2 svg {
+    color: #14b8a6;
+}
+
+/* Dashboard report grid */
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.report-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #14b8a6;
+}
+
+.report-section.books { border-left-color: #14b8a6; }
+.report-section.members { border-left-color: #9b59b6; }
+.report-section.borrows { border-left-color: #3498db; }
+.report-section.fines { border-left-color: #ef4444; }
+
+.report-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+}
+
+.report-section-title svg {
+    width: 16px;
+    height: 16px;
+}
+
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-size: 14px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.report-row:last-child {
+    border-bottom: none;
+}
+
+.report-row span {
+    color: #64748b;
+}
+
+.report-row strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Rank list for Top Books/Borrowers */
+.rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.rank-item:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.rank-item.top-1 { border-left-color: #fbbf24; background: linear-gradient(90deg, #fef3c7 0%, #f8fafc 30%); }
+.rank-item.top-2 { border-left-color: #94a3b8; background: linear-gradient(90deg, #f1f5f9 0%, #f8fafc 30%); }
+.rank-item.top-3 { border-left-color: #d97706; background: linear-gradient(90deg, #fed7aa 0%, #f8fafc 30%); }
+
+.rank-number {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    background: linear-gradient(135deg, #94a3b8, #64748b);
+    color: white;
+    flex-shrink: 0;
+}
+
+.rank-item.top-1 .rank-number { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.rank-item.top-2 .rank-number { background: linear-gradient(135deg, #cbd5e1, #94a3b8); }
+.rank-item.top-3 .rank-number { background: linear-gradient(135deg, #fb923c, #ea580c); }
+
+.rank-info {
+    flex: 1;
+}
+
+.rank-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+.rank-subtitle {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.rank-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.rank-count {
+    font-size: 18px;
+    font-weight: 800;
+    color: #14b8a6;
+}
+
+.rank-label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Overdue table */
+.overdue-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.overdue-table th {
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.overdue-table td {
+    padding: 14px;
+    font-size: 13px;
+    color: #334155;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.overdue-table tr:hover {
+    background: #fef2f2;
+}
+
+.days-late-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.member-avatar-sm {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    margin-right: 8px;
+}
+
+.member-avatar-sm.student { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.member-avatar-sm.faculty { background: linear-gradient(135deg, #ec4899, #db2777); }
+.member-avatar-sm.community { background: linear-gradient(135deg, #10b981, #059669); }
+
+/* Empty state */
+.report-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: #94a3b8;
+}
+
+.report-empty svg {
+    color: #10b981;
+    margin-bottom: 12px;
+}
+
+.report-empty h3 {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 800px) {
+    .report-tabs {
+        width: 100%;
+    }
+    .report-tab {
+        flex: 1;
+        justify-content: center;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}

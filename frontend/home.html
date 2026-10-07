@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Animated background -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <main class="home-container">
+
+        <!-- Header -->
+        <header class="home-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Library</h1>
+                    <span>Management System</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Welcome to Your Library</h2>
+            <p>Your gateway to knowledge, borrowing, and reading</p>
+        </section>
+
+        <!-- Two Choice Cards -->
+        <section class="choices">
+
+            <!-- Member Card -->
+            <div class="choice-card member-card">
+                <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <h3>I'm a Member</h3>
+                <p>Browse books, view your borrowing history, and check your fines</p>
+                <div class="card-actions">
+                    <a href="/member-login" class="btn-member">Sign In</a>
+                    <a href="/member-register" class="btn-link">Register →</a>
+                </div>
+            </div>
+
+            <!-- Librarian Card -->
+            <div class="choice-card admin-card">
+                <div class="card-icon" style="background: linear-gradient(135deg, #14b8a6, #0ea5e9);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 7h-9"></path>
+                        <path d="M14 17H5"></path>
+                        <circle cx="17" cy="17" r="3"></circle>
+                        <circle cx="7" cy="7" r="3"></circle>
+                    </svg>
+                </div>
+                <h3>I'm a Librarian</h3>
+                <p>Manage books, members, transactions, and library reports</p>
+                <div class="card-actions">
+                    <a href="/admin-login" class="btn-admin">Sign In</a>
+                    <span class="btn-link" style="cursor: default; opacity: 0.6;">Admin Access</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="home-footer">
+            <p>© 2026 Library Management System | A Web Application</p>
+        </footer>
+
+    </main>
+
+    <script src="/js/toast.js"></script>
+</body>
+</html>
