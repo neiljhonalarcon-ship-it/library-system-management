@@ -58,12 +58,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" placeholder="juan@email.com" required>
-                        <small class="field-hint">The verification code will be sent here</small>
-                    </div>
-
-                    <div class="form-group">
                         <label for="contact_number">Contact Number *</label>
                         <input type="tel" id="contact_number" placeholder="09171234567" maxlength="11" inputmode="numeric" required>
                         <small class="field-hint">11 digits only</small>
@@ -102,6 +96,12 @@
                 <!-- Account Info -->
                 <div class="form-section">
                     <h3 class="form-section-title">Account Information</h3>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" placeholder="juan@email.com" required>
+                        <small class="field-hint">The verification code will be sent here</small>
+                    </div>
 
                     <div class="form-group">
                         <label for="username">Username *</label>
@@ -154,7 +154,7 @@
         </div>
     </div>
 
-    <!-- VERIFICATION MODAL - Beautiful OTP Design -->
+    <!-- VERIFICATION MODAL -->
     <div class="modal-overlay" id="verifyModal">
         <div class="modal verify-modal">
             <div class="modal-header">
@@ -176,7 +176,6 @@
                     <strong id="verifyEmail">your email</strong>
                 </p>
 
-                <!-- 6-digit code inputs -->
                 <div class="code-inputs" id="codeInputs">
                     <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
                     <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">

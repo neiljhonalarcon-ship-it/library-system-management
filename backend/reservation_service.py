@@ -32,24 +32,30 @@ def create_reservation(member_id, book_id, pickup_date, pickup_time, notes=None)
 
     # Validate date format (YYYY-MM-DD)
     try:
-        datetime.strptime(pickup_date, "%Y-%m-%d")
+        pickup_dt = datetime.strptime(pickup_date, "%Y-%m-%d")
     except ValueError:
         return False, "Invalid pickup date format", None
 
     # Validate time format (HH:MM)
     try:
-        datetime.strptime(pickup_time, "%H:%M")
+        pickup_t = datetime.strptime(pickup_time, "%H:%M").time()
     except ValueError:
         return False, "Invalid pickup time format", None
 
     # Validate pickup date is not in the past
     today = datetime.now().date()
-    try:
-        pickup = datetime.strptime(pickup_date, "%Y-%m-%d").date()
-        if pickup < today:
-            return False, "Pickup date cannot be in the past", None
-    except Exception:
-        pass
+    if pickup_dt.date() < today:
+        return False, "Pickup date cannot be in the past", None
+
+    # 🚨 NEW: Bawal Sabado at Linggo
+    if pickup_dt.weekday() >= 5:
+        return False, "The library is CLOSED on weekends (Saturday & Sunday). Please choose a weekday (Mon-Fri).", None
+
+    # 🚨 NEW: Oras dapat 7:00 AM to 7:00 PM lang
+    open_time = datetime.strptime("07:00", "%H:%M").time()
+    close_time = datetime.strptime("19:00", "%H:%M").time()
+    if pickup_t < open_time or pickup_t >= close_time:
+        return False, "The library is only open from 7:00 AM to 7:00 PM. Please choose a time within that range.", None
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -370,3 +376,10 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("✅ Reservation service test complete!")
     print("=" * 60 + "\n")
+
+
+
+
+
+
+

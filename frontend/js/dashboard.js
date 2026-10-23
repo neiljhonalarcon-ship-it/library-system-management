@@ -25,7 +25,6 @@ async function loadStats() {
         if (!data) return;
 
         animateNumber("stat-books", data.total_books);
-        animateNumber("stat-copies", data.total_copies);
         animateNumber("stat-members", data.total_members);
         animateNumber("stat-borrowed", data.borrowed);
         animateNumber("stat-overdue", data.overdue);

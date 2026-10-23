@@ -11,18 +11,21 @@ let currentReserveBookId = null;
 // ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("current-date").textContent = new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        weekday: "long", year: "numeric", month: "long", day: "numeric",
     });
 
     await loadMemberInfo();
+    await loadNotifications(); 
     switchTab("dashboard");
+
+    // 🚨 AUTO-POLLING: Magche-check ng notification every 10 seconds
+    setInterval(() => {
+        loadNotifications();
+    }, 10000); 
 });
 
 // ============================================================
-// LOAD MEMBER INFO
+// LOAD MEMBER INFO (Updated for Profile Picture)
 // ============================================================
 async function loadMemberInfo() {
     try {
@@ -33,10 +36,17 @@ async function loadMemberInfo() {
         }
         currentMember = await response.json();
 
-        document.getElementById("sidebar-name").textContent =
-            `${currentMember.first_name} ${currentMember.last_name}`;
-        document.getElementById("page-subtitle").textContent =
-            `Welcome back, ${currentMember.first_name}!`;
+        document.getElementById("sidebar-name").textContent = `${currentMember.first_name} ${currentMember.last_name}`;
+        document.getElementById("page-subtitle").textContent = `Welcome back, ${currentMember.first_name}!`;
+        
+        // Update Sidebar Avatar
+        const avatarContainer = document.getElementById("sidebar-avatar");
+        if (currentMember.profile_pic) {
+            avatarContainer.innerHTML = `<img src="/uploads/members/${currentMember.profile_pic}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        } else {
+            const initials = ((currentMember.first_name[0] || "") + (currentMember.last_name[0] || "")).toUpperCase();
+            avatarContainer.textContent = initials;
+        }
     } catch (err) {
         console.error(err);
         window.location.href = "/member-login";
@@ -49,11 +59,9 @@ async function loadMemberInfo() {
 function switchTab(tab, el) {
     currentTab = tab;
 
-    // Update sidebar active state
     document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
     if (el) el.classList.add("active");
     else {
-        // If no element, find by tab name
         document.querySelectorAll(".nav-item").forEach(item => {
             const onclick = item.getAttribute("onclick") || "";
             if (onclick.includes(`'${tab}'`)) {
@@ -62,17 +70,16 @@ function switchTab(tab, el) {
         });
     }
 
-    // Update page title
     const titles = {
         "dashboard": "My Dashboard",
         "browse": "Browse Books",
         "reservations": "My Reservations",
         "history": "My Borrowing History",
         "fines": "My Fines",
+        "profile": "My Profile", 
     };
     document.getElementById("page-title").textContent = titles[tab] || "My Portal";
 
-    // Load content
     const content = document.getElementById("content-area");
     content.innerHTML = '<div class="loading">Loading...</div>';
 
@@ -81,6 +88,7 @@ function switchTab(tab, el) {
     else if (tab === "reservations") renderReservations();
     else if (tab === "history") renderHistory();
     else if (tab === "fines") renderFines();
+    else if (tab === "profile") renderProfile(); 
 }
 
 // ============================================================
@@ -170,7 +178,7 @@ async function renderDashboard() {
                 <tbody>
                     ${borrows.map(b => `
                         <tr>
-                            <td><strong>${escapeHtml(b.book_title)}</strong></td>
+                            <td><strong>${escapeHtml(b.book_title)}</strong> <span style="color: #64748b; font-size: 12px;">(Copy #${b.copy_number || 1})</span></td>
                             <td>${formatDate(b.borrow_date)}</td>
                             <td>${formatDate(b.due_date)}</td>
                             <td><span class="status-pill ${b.status.toLowerCase()}">${b.status}</span></td>
@@ -183,7 +191,7 @@ async function renderDashboard() {
 }
 
 // ============================================================
-// BROWSE BOOKS TAB (with Reserve button)
+// BROWSE BOOKS TAB
 // ============================================================
 async function renderBrowse() {
     const content = document.getElementById("content-area");
@@ -195,6 +203,7 @@ async function renderBrowse() {
         console.error(err);
     }
 
+    // 🚨 KUNG WALANG BOOKS, DITO LANG DAPAT
     if (books.length === 0) {
         content.innerHTML = `
             <div class="portal-empty">
@@ -206,45 +215,120 @@ async function renderBrowse() {
         return;
     }
 
+    // 🚨 KUNG MAY BOOKS, I-RENDER YUNG CARDS
     content.innerHTML = `
         <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
-            Browse our collection. Reserve a book and we'll have it ready for pickup!
+            Browse our collection. Click a book to see more details and reserve it!
         </p>
         <div class="books-grid">
             ${books.map(b => {
                 const avail = b.available_copies;
                 const cls = avail === 0 ? "out" : (avail <= 2 ? "low" : "");
-                return `
-                    <div class="book-card">
-                        <h4>${escapeHtml(b.title)}</h4>
-                        <p class="book-author">by ${escapeHtml(b.author_name || "Unknown")}</p>
-                        <div class="book-meta">
-                            ${b.genre ? `<span class="book-tag">${escapeHtml(b.genre)}</span>` : ""}
-                            ${b.publication_year ? `<span class="book-tag">${b.publication_year}</span>` : ""}
+                const images = b.images ? JSON.parse(b.images) : [];
+                
+                let coverHTML = "";
+                if (images.length > 0) {
+                    const carouselId = `car-${b.book_id}`;
+                    const imgTags = images.map((img, i) => 
+                        `<img src="/uploads/books/${img}" class="carousel-img" style="display: ${i === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover;" alt="${escapeHtml(b.title)}">`
+                    ).join("");
+                    
+                    const controls = images.length > 1 ? `
+                        <button class="carousel-btn prev" onclick="event.stopPropagation(); moveCarousel('${carouselId}', -1)">❮</button>
+                        <button class="carousel-btn next" onclick="event.stopPropagation(); moveCarousel('${carouselId}', 1)">❯</button>
+                    ` : "";
+
+                    coverHTML = `
+                        <div class="carousel-container" id="${carouselId}" data-index="0" data-total="${images.length}">
+                            ${imgTags}${controls}
                         </div>
-                        <p class="book-availability ${cls}">
-                            ${avail} of ${b.total_copies} available
-                        </p>
-                        ${avail > 0 ? `
-                            <button class="btn-reserve" onclick="openReserveModal(${b.book_id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}', '${escapeHtml(b.author_name || "Unknown").replace(/'/g, "\\'")}')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
+                    `;
+                } else {
+                    coverHTML = `
+                        <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color:#94a3b8;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="book-card" onclick="openBookDetails(${b.book_id}, '${escapeJs(b.title)}', '${escapeJs(b.author_name || 'Unknown')}', ${avail}, ${b.total_copies}, '${escapeJs(b.genre || '')}', ${b.publication_year || 'null'}, '${b.images || ''}')" style="cursor: pointer;">
+                        <div class="book-card-cover" style="height: 160px; overflow: hidden; border-radius: 12px 12px 0 0; position: relative;">
+                            ${coverHTML}
+                        </div>
+                        <div class="book-card-body" style="padding: 16px;">
+                            <h4 style="margin-bottom: 4px; font-size: 16px;">${escapeHtml(b.title)}</h4>
+                            <p class="book-author" style="margin-bottom: 12px;">by ${escapeHtml(b.author_name || "Unknown")}</p>
+                            
+                            <p class="book-availability ${cls}" style="font-weight: 700; margin-bottom: 12px; font-size: 13px;">
+                                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background: ${avail === 0 ? '#ef4444' : (avail <= 2 ? '#f59e0b' : '#10b981')}; margin-right: 6px;"></span>
+                                ${avail} of ${b.total_copies} available
+                            </p>
+                            
+                            <button class="btn-reserve" onclick="event.stopPropagation(); openReserveModal(${b.book_id}, '${escapeJs(b.title)}', '${escapeJs(b.author_name || "Unknown")}')" style="width: 100%;">
                                 Reserve This Book
                             </button>
-                        ` : `
-                            <button class="btn-reserve" style="background: #e2e8f0; color: #94a3b8; box-shadow: none; cursor: not-allowed;" disabled>
-                                Not Available
-                            </button>
-                        `}
+                        </div>
                     </div>
                 `;
             }).join("")}
         </div>
     `;
+
+    // 🚨 IDAGDAG ITO SA PINAKA-DULO NG renderBrowse
+    document.querySelectorAll('.carousel-container').forEach(el => {
+        startAutoSlide(el);
+    });
+}
+
+// ============================================================
+// 🚨 AUTO SLIDESHOW LOGIC (IDAGDAG SA PINAKA-BABA)
+// ============================================================
+window.moveCarousel = function(carouselId, direction) {
+    const el = document.getElementById(carouselId);
+    if (!el) return;
+
+    // Clear existing timer
+    if (el.dataset.intervalId) {
+        clearInterval(parseInt(el.dataset.intervalId));
+    }
+
+    const images = el.querySelectorAll('.carousel-img');
+    let current = parseInt(el.dataset.index);
+    let total = parseInt(el.dataset.total);
+
+    images[current].style.display = 'none';
+    current = (current + direction + total) % total;
+    images[current].style.display = 'block';
+    el.dataset.index = current;
+
+    // Restart timer
+    startAutoSlide(el);
+}
+
+function startAutoSlide(carouselEl) {
+    const total = parseInt(carouselEl.dataset.total);
+    if (total <= 1) return; // Wag mag-slide kung isa lang ang picture
+
+    if (carouselEl.dataset.intervalId) {
+        clearInterval(parseInt(carouselEl.dataset.intervalId));
+    }
+
+    const intervalId = setInterval(() => {
+        moveCarousel(carouselEl.id, 1);
+    }, 3000); // Mag-slide every 3 seconds
+
+    carouselEl.dataset.intervalId = intervalId;
+
+    // Pause kapag tinututukan ng mouse (Hover)
+    carouselEl.onmouseenter = () => {
+        clearInterval(parseInt(carouselEl.dataset.intervalId));
+    };
+
+    // Resume kapag umalis yung mouse
+    carouselEl.onmouseleave = () => {
+        startAutoSlide(carouselEl);
+    };
 }
 
 // ============================================================
@@ -349,7 +433,6 @@ function openReserveModal(bookId, title, author) {
     document.getElementById("reserveNotes").value = "";
     document.getElementById("reserveError").textContent = "";
 
-    // Set min date to today
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("reserveDate").min = today;
 
@@ -402,6 +485,7 @@ async function submitReservation() {
         if (result.success) {
             showToast("Reservation confirmed!", "success", { title: "Reserved" });
             closeReserveModal();
+            await loadNotifications(); 
             setTimeout(() => switchTab("reservations"), 500);
         } else {
             errorEl.textContent = result.error || "Failed to reserve";
@@ -436,6 +520,7 @@ async function cancelReservation(reservationId) {
         if (result.success) {
             showToast("Reservation cancelled", "success");
             renderReservations();
+            await loadNotifications();
         } else {
             showToast(result.error || "Failed to cancel", "error");
         }
@@ -483,7 +568,7 @@ async function renderHistory() {
             <tbody>
                 ${history.map(h => `
                     <tr>
-                        <td><strong>${escapeHtml(h.book_title)}</strong></td>
+                        <td><strong>${escapeHtml(h.book_title)}</strong> <span style="color: #64748b; font-size: 12px;">(Copy #${h.copy_number || 1})</span></td>
                         <td>${formatDate(h.borrow_date)}</td>
                         <td>${formatDate(h.due_date)}</td>
                         <td>${h.return_date ? formatDate(h.return_date) : "—"}</td>
@@ -555,6 +640,240 @@ async function renderFines() {
 }
 
 // ============================================================
+// PROFILE TAB (WITH SHOW/HIDE PASSWORD AND UPLOAD)
+// ============================================================
+function renderProfile() {
+    const content = document.getElementById("content-area");
+    
+    if (!currentMember) return;
+
+    const picPreview = currentMember.profile_pic 
+        ? `<img id="prof_pic_preview" src="/uploads/members/${currentMember.profile_pic}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; margin-bottom: 10px;">`
+        : `<div id="prof_pic_preview" style="width: 100px; height: 100px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #64748b; margin-bottom: 10px;">${((currentMember.first_name[0] || "") + (currentMember.last_name[0] || "")).toUpperCase()}</div>`;
+
+    content.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
+            <!-- EDIT INFO CARD -->
+            <div class="book-card" style="padding: 24px; cursor: default;">
+                <h3 style="margin-bottom: 20px; font-size: 18px; color: #0f172a; display:flex; align-items:center; gap:8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Personal Information
+                </h3>
+                
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    ${picPreview}
+                    <div>
+                        <label for="prof_pic_input" style="display: inline-block; padding: 8px 12px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: #475569;">
+                            Choose Image
+                        </label>
+                        <input type="file" id="prof_pic_input" accept="image/*" style="display: none;" onchange="previewProfilePic(this)">
+                        <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Optional. Max 2MB.</p>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Email (Read-only)</label>
+                    <input type="email" value="${escapeHtml(currentMember.email)}" readonly style="background:#f1f5f9; cursor:not-allowed; border-color:#e2e8f0; color:#64748b;">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Username (Read-only)</label>
+                    <input type="text" value="${escapeHtml(currentMember.username)}" readonly style="background:#f1f5f9; cursor:not-allowed; border-color:#e2e8f0; color:#64748b;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="prof_first_name" value="${escapeHtml(currentMember.first_name)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="prof_last_name" value="${escapeHtml(currentMember.last_name)}">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Contact Number</label>
+                    <input type="tel" id="prof_contact" value="${escapeHtml(currentMember.contact_number || '')}">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Section (Optional)</label>
+                    <input type="text" id="prof_section" value="${escapeHtml(currentMember.section || '')}" placeholder="e.g., STEM A">
+                </div>
+
+                <button class="btn-reserve" onclick="saveProfile()" style="width: 100%;">Save Changes</button>
+            </div>
+
+            <!-- SECURITY CARD -->
+            <div class="book-card" style="padding: 24px; cursor: default; height: fit-content;">
+                <h3 style="margin-bottom: 20px; font-size: 18px; color: #0f172a; display:flex; align-items:center; gap:8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Change Password
+                </h3>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Current Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="old_password" placeholder="Enter current password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('old_password', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="new_password" placeholder="At least 6 characters">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('new_password', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Confirm New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirm_password" placeholder="Re-enter new password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm_password', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-reserve" style="width: 100%; background: linear-gradient(135deg, #0f172a, #334155);" onclick="changePassword()">Update Password</button>
+            </div>
+
+        </div>
+    `;
+}
+
+window.previewProfilePic = function(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('prof_pic_preview');
+            if (preview.tagName === 'IMG') {
+                preview.src = e.target.result;
+            } else {
+                preview.outerHTML = `<img id="prof_pic_preview" src="${e.target.result}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; margin-bottom: 10px;">`;
+            }
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function saveProfile() {
+    const fileInput = document.getElementById("prof_pic_input");
+    
+    const formData = new FormData();
+    formData.append("first_name", document.getElementById("prof_first_name").value.trim());
+    formData.append("last_name", document.getElementById("prof_last_name").value.trim());
+    formData.append("contact_number", document.getElementById("prof_contact").value.trim());
+    formData.append("section", document.getElementById("prof_section").value.trim());
+    
+    if (fileInput && fileInput.files.length > 0) {
+        formData.append("profile_pic", fileInput.files[0]);
+    }
+
+    if (!formData.get("first_name") || !formData.get("last_name")) {
+        showToast("First and Last Name are required", "error");
+        return;
+    }
+
+    const confirmed = await showConfirm({
+        title: "Save Changes?",
+        message: "Are you sure you want to update your profile information?",
+        confirmText: "Yes, Save",
+        cancelText: "Cancel",
+        type: "success" 
+    });
+
+    if (!confirmed) return; 
+
+    try {
+        const res = await fetch("/api/member/profile", {
+            method: "PUT",
+            body: formData 
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            showToast("Profile updated successfully!", "success");
+            await loadMemberInfo(); 
+            renderProfile(); 
+        } else {
+            showToast(result.error || "Failed to update profile", "error");
+        }
+    } catch (err) {
+        console.error(err);
+        showToast("Connection error", "error");
+    }
+}
+
+async function changePassword() {
+    const oldPass = document.getElementById("old_password").value;
+    const newPass = document.getElementById("new_password").value;
+    const confirmPass = document.getElementById("confirm_password").value;
+
+    if (!oldPass || !newPass || !confirmPass) {
+        showToast("Please fill in all password fields", "error");
+        return;
+    }
+    if (newPass !== confirmPass) {
+        showToast("New passwords do not match", "error");
+        return;
+    }
+    if (newPass.length < 6) {
+        showToast("New password must be at least 6 characters", "error");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/member/change-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ old_password: oldPass, new_password: newPass })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            showToast("Password changed successfully!", "success");
+            document.getElementById("old_password").value = "";
+            document.getElementById("new_password").value = "";
+            document.getElementById("confirm_password").value = "";
+        } else {
+            showToast(result.error || "Failed to change password", "error");
+        }
+    } catch (err) {
+        showToast("Connection error", "error");
+    }
+}
+
+window.togglePasswordVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const svg = btn.querySelector('svg');
+    
+    if (input.type === "password") {
+        input.type = "text";
+        svg.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+        btn.style.color = "#0f172a";
+    } else {
+        input.type = "password";
+        svg.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        btn.style.color = "#94a3b8";
+    }
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 function escapeHtml(str) {
@@ -565,6 +884,11 @@ function escapeHtml(str) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+function escapeJs(str) {
+    if (!str) return "";
+    return String(str).replace(/'/g, "\\'").replace(/\\/g, "\\\\");
 }
 
 function formatDate(dateStr) {
@@ -590,4 +914,156 @@ async function memberLogout() {
 // ============================================================
 document.getElementById("reserveModal").addEventListener("click", function (e) {
     if (e.target === this) closeReserveModal();
+});
+
+
+// ============================================================
+// RESERVATION DATE & TIME VALIDATION
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("reserveDate");
+    const timeInput = document.getElementById("reserveTime");
+
+    if (!dateInput) return;
+
+    function setMinDate() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        dateInput.min = `${yyyy}-${mm}-${dd}`;
+    }
+    setMinDate();
+
+    dateInput.addEventListener("change", function () {
+        if (!this.value) return;
+        const selected = new Date(this.value + "T00:00:00");
+        const day = selected.getDay(); 
+
+        if (day === 0 || day === 6) {
+            if (typeof showToast === "function") {
+                showToast("Library is CLOSED on weekends. Please pick a weekday (Mon-Fri).", "error");
+            } else {
+                alert("❌ Library is CLOSED on weekends. Please pick a weekday (Mon-Fri).");
+            }
+            this.value = ""; 
+        }
+    });
+
+    if (timeInput) {
+        timeInput.addEventListener("change", function () {
+            if (!this.value) return;
+            const [hours, minutes] = this.value.split(":").map(Number);
+            const totalMin = hours * 60 + minutes;
+            const openMin = 7 * 60;   
+            const closeMin = 19 * 60; 
+
+            if (totalMin < openMin || totalMin >= closeMin) {
+                if (typeof showToast === "function") {
+                    showToast("Library hours are 7:00 AM to 7:00 PM only.", "error");
+                } else {
+                    alert("❌ Library hours are 7:00 AM to 7:00 PM only.");
+                }
+                this.value = ""; 
+            }
+        });
+    }
+});
+
+
+// ============================================================
+// 🚨 NOTIFICATIONS LOGIC (With Read Status)
+// ============================================================
+async function loadNotifications() {
+    try {
+        const res = await fetch("/api/member/notifications");
+        let notifs = await res.json();
+
+        // ========================================================
+        // 🚨 1. SIDEBAR BADGE LOGIC (Laging nakikita kung may Pending/Ready)
+        // ========================================================
+        const sidebarBadge = document.getElementById("res-sidebar-badge");
+        const activeCount = notifs.filter(n => n.type === 'pending' || n.type === 'ready').length;
+
+        if (sidebarBadge) {
+            if (activeCount > 0) {
+                sidebarBadge.style.display = "inline-block";
+                sidebarBadge.textContent = activeCount;
+            } else {
+                sidebarBadge.style.display = "none";
+            }
+        }
+
+        // ========================================================
+        // 🚨 2. BELL NOTIFICATION LOGIC (Nawawala pag clinick)
+        // ========================================================
+        // Kunin yung mga naclick/nabasa na
+        const readNotifs = JSON.parse(localStorage.getItem('readNotifs') || '[]');
+        
+        // I-filter out yung mga nabasa na
+        const activeNotifs = notifs.filter(n => !readNotifs.includes(n.id));
+
+        const badge = document.getElementById("notif-badge");
+        const dropdown = document.getElementById("notif-dropdown");
+        
+        if (activeNotifs.length > 0) {
+            badge.style.display = "flex";
+            badge.textContent = activeNotifs.length;
+            
+            dropdown.innerHTML = activeNotifs.map(n => `
+                <div class="notif-item" onclick="handleNotifClick('${n.tab}', '${n.id}')">
+                    <div class="notif-icon ${n.type}">
+                        ${n.type === 'ready' ? '✅' : (n.type === 'pending' ? '⏳' : '📚')}
+                    </div>
+                    <div class="notif-content">
+                        <p>${n.message}</p>
+                    </div>
+                </div>
+            `).join("");
+        } else {
+            badge.style.display = "none";
+            dropdown.innerHTML = `<div style="padding: 15px; text-align: center; color: #64748b; font-size: 13px;">No new notifications</div>`;
+        }
+    } catch (err) {
+        console.error("Failed to load notifications:", err);
+    }
+}
+
+function toggleNotifications(event) {
+    event.stopPropagation(); // Para hindi mag-close agad
+    const dropdown = document.getElementById("notif-dropdown");
+    dropdown.classList.toggle("show");
+}
+
+function handleNotifClick(tab, notifId) {
+    // I-save sa localStorage
+    let readNotifs = JSON.parse(localStorage.getItem('readNotifs') || '[]');
+    if (!readNotifs.includes(notifId)) {
+        readNotifs.push(notifId);
+        localStorage.setItem('readNotifs', JSON.stringify(readNotifs));
+    }
+
+    document.getElementById("notif-dropdown").classList.remove("show");
+    
+    // I-refresh yung notifications para mawala yung badge/number agad
+    loadNotifications(); 
+
+    // Hanapin yung sidebar link para mag-highlight
+    const navItems = document.querySelectorAll('.nav-item');
+    let targetEl = null;
+    navItems.forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`'${tab}'`)) {
+            targetEl = item;
+        }
+    });
+    switchTab(tab, targetEl);
+}
+
+// Isara ang dropdown pag clinick sa labas
+window.addEventListener('click', function(e) {
+    const dropdown = document.getElementById("notif-dropdown");
+    const btn = document.querySelector('.notif-btn');
+    if (dropdown && dropdown.classList.contains('show') && !btn.contains(e.target)) {
+        dropdown.classList.remove('show');
+    }
 });

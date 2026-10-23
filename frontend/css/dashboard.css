@@ -71,10 +71,13 @@ body {
     gap: 4px;
 }
 
+/* FIX SIDEBAR LAYOUT JUMPING */
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: flex-start;
+    min-height: 48px;
+    margin-bottom: 4px;
     padding: 12px 14px;
     color: #cbd5e1;
     text-decoration: none;
@@ -94,10 +97,29 @@ body {
     background: linear-gradient(135deg, #14b8a6, #0ea5e9);
     color: white;
     box-shadow: 0 8px 20px -5px rgba(20, 184, 166, 0.5);
+    min-height: 48px;
 }
 
 .nav-item svg {
     flex-shrink: 0;
+}
+
+/* ============================================================
+   SIDEBAR NOTIFICATION BADGE DESIGN (CLEANED UP)
+   ============================================================ */
+.nav-item .badge {
+    background-color: #ef4444 !important;
+    color: white !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 20px !important;
+    margin-left: auto !important;
+    line-height: 1.5 !important;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;
+    min-width: 20px;
+    text-align: center;
+    display: none; /* Default: hidden. JS will show this if > 0 */
 }
 
 .logout-btn {
@@ -335,4 +357,106 @@ body {
         align-items: flex-start;
         gap: 15px;
     }
+}
+
+/* ============================================================
+   COLOR-CODED ADMIN BADGES
+   ============================================================ */
+.nav-item .badge {
+    /* Yung dating CSS mo, siguraduhing may display: none; at padding */
+    background-color: #ef4444 !important;
+    color: white !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 20px !important;
+    margin-left: auto !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* 🚨 GREEN KAPAG MAY READY */
+.nav-item .badge.badge-ready {
+    background-color: #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5) !important;
+    animation: pulse-green 2s infinite;
+}
+
+/* 🚨 ORANGE KAPAG MAY PENDING */
+.nav-item .badge.badge-pending {
+    background-color: #f59e0b !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
+    animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* ============================================================
+   ADMIN HEADER BELL
+   ============================================================ */
+.admin-bell-container { position: relative; }
+
+.admin-bell-btn {
+    background: white; border: 1px solid #e2e8f0;
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #64748b;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: 0.2s; position: relative;
+}
+.admin-bell-btn:hover { background: #f8fafc; color: #0f172a; }
+
+.admin-bell-badge {
+    position: absolute; top: -2px; right: -2px;
+    background: #ef4444; color: white;
+    font-size: 11px; font-weight: 700;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+}
+
+.admin-notif-dropdown {
+    position: absolute; top: 50px; right: 0;
+    width: 320px; background: white; border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0; z-index: 1000;
+    display: none; flex-direction: column; overflow: hidden;
+}
+.admin-notif-dropdown.show { display: flex; }
+
+.notif-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 15px; border-bottom: 1px solid #f1f5f9;
+    cursor: pointer; transition: 0.2s;
+}
+.notif-item:hover { background: #f8fafc; }
+.notif-content p { margin: 0; font-size: 13px; color: #334155; line-height: 1.4; font-weight: 500; }
+
+/* ============================================================
+   FIX PARA SA BROWSER AUTOFILL AT PASSWORD MANAGER
+   ============================================================ */
+/* Tinatanggal yung white/yellow background pag nag-autofill ang browser */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px var(--bg-main) inset !important;
+    -webkit-text-fill-color: var(--text-main) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Focus effect para sa input */
+#adminPasswordInput:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+    background: var(--bg-card) !important;
 }

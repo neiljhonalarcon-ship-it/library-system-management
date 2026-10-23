@@ -145,7 +145,7 @@ def register_member(first_name, last_name, email, contact_number,
             (first_name, last_name, email, contact_number, member_type,
              username, password_hash, grade_level, section,
              approval_status, email_verified)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 0)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Unverified', 0)
         """, (
             first_name, last_name, email, contact_number, member_type,
             username, password_hash, grade_level, section,
@@ -183,10 +183,14 @@ def verify_registration(email, code):
     if not success:
         return False, message, None
 
-    # Mark email as verified
+    # Mark email as verified AND move to Pending approval
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("UPDATE members SET email_verified = 1 WHERE email = ?", (email,))
+    c.execute("""
+        UPDATE members 
+        SET email_verified = 1, approval_status = 'Pending'
+        WHERE email = ?
+    """, (email,))
     conn.commit()
     conn.close()
 
@@ -221,6 +225,9 @@ def member_login(username, password):
     except Exception:
         return False, "Invalid username or password", None
 
+    if member["approval_status"] == "Unverified":
+        return False, "Please verify your email first", None
+
     if member["approval_status"] == "Pending":
         return False, "Your account is pending admin approval", None
 
@@ -251,7 +258,7 @@ def get_member_profile(member_id):
     member = c.execute("""
         SELECT member_id, first_name, last_name, email, contact_number,
                member_type, grade_level, section, date_registered,
-               total_fines, approval_status, username
+               total_fines, approval_status, username, profile_pic
         FROM members WHERE member_id = ?
     """, (member_id,)).fetchone()
 
@@ -263,7 +270,7 @@ def get_member_profile(member_id):
 # GET PENDING MEMBERS (for admin)
 # ============================================================
 def get_pending_members():
-    """Get all members waiting for approval."""
+    """Get all members waiting for admin approval."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
@@ -274,6 +281,7 @@ def get_pending_members():
                approval_status, email_verified
         FROM members
         WHERE approval_status = 'Pending'
+          AND email_verified = 1        -- 🚨 ITO YUNG FIX! Dapat verified na muna
         ORDER BY date_registered DESC
     """).fetchall()
 
@@ -362,3 +370,78 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("✅ Auth service test complete!")
     print("=" * 60 + "\n")
+
+
+    # ============================================================
+# FORGOT PASSWORD — Request Reset Code
+# ============================================================
+def request_password_reset(email):
+    """
+    Send a password reset code to the member's email.
+    Returns: (success: bool, message: str, extra: dict or None)
+    """
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    member = c.execute("""
+        SELECT member_id, first_name, contact_number, approval_status, email_verified
+        FROM members WHERE email = ?
+    """, (email,)).fetchone()
+
+    conn.close()
+
+    # Security: don't reveal if email exists
+    if not member:
+        return True, "If that email is registered, a reset code was sent.", None
+
+    if not member["email_verified"]:
+        return True, "If that email is registered, a reset code was sent.", None
+
+    # Generate and save code
+    code = generate_code()
+    save_verification_code(email, code, purpose="password_reset")
+
+    # Send email + simulated SMS
+    result = send_verification_both(email, member["contact_number"], code, member["first_name"])
+
+    return True, "Reset code sent! Check your email.", {
+        "code_preview": code if not result["email_sent"] else None,
+        "email_sent": result["email_sent"],
+    }
+
+
+# ============================================================
+# FORGOT PASSWORD — Verify Reset Code
+# ============================================================
+def verify_reset_code(email, code):
+    """Verify a password reset code (marks as used)."""
+    success, message = verify_code(email, code, purpose="password_reset")
+    if not success:
+        return False, message
+    return True, "Code verified"
+
+
+# ============================================================
+# FORGOT PASSWORD — Reset the Password
+# ============================================================
+def reset_password(email, new_password):
+    """Reset a member's password."""
+    if len(new_password) < 6:
+        return False, "Password must be at least 6 characters"
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    member = c.execute("SELECT member_id FROM members WHERE email = ?", (email,)).fetchone()
+    if not member:
+        conn.close()
+        return False, "Account not found"
+
+    password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+    c.execute("UPDATE members SET password_hash = ? WHERE email = ?", (password_hash, email))
+    conn.commit()
+    conn.close()
+
+    return True, "Password reset successful! You can now log in."

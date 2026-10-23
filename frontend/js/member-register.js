@@ -1,14 +1,14 @@
 // ============================================================
-// MEMBER REGISTRATION LOGIC (with beautiful OTP modal)
+// MEMBER REGISTRATION LOGIC
 // ============================================================
 
 let registeredEmail = "";
 let timerInterval = null;
-let countdownSeconds = 600;  // 10 minutes
+let countdownSeconds = 600;  
 let resendSeconds = 0;
 
 // ============================================================
-// PASSWORD TOGGLES
+// PASSWORD TOGGLES (Auto-Hide on Blur)
 // ============================================================
 function setupPasswordToggle(toggleId, inputId, iconId) {
     const toggle = document.getElementById(toggleId);
@@ -20,8 +20,8 @@ function setupPasswordToggle(toggleId, inputId, iconId) {
     const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
     const EYE_CLOSED = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
 
-    // Toggle show/hide on eye click
-    toggle.addEventListener("click", function () {
+    toggle.addEventListener("click", function (e) {
+        e.preventDefault();
         if (input.type === "password") {
             input.type = "text";
             icon.innerHTML = EYE_CLOSED;
@@ -33,7 +33,7 @@ function setupPasswordToggle(toggleId, inputId, iconId) {
         }
     });
 
-    // ⭐ NEW: Reset to hidden when input loses focus (clicking elsewhere)
+    // Auto-Hide when user clicks away
     input.addEventListener("blur", function () {
         if (input.type === "text") {
             input.type = "password";
@@ -46,14 +46,12 @@ function setupPasswordToggle(toggleId, inputId, iconId) {
 setupPasswordToggle("togglePassword", "password", "eyeIcon");
 setupPasswordToggle("toggleConfirm", "confirm_password", "eyeIconConfirm");
 
-
 // ============================================================
 // CONTACT NUMBER: DIGITS ONLY
 // ============================================================
 document.getElementById("contact_number").addEventListener("input", function () {
     this.value = this.value.replace(/\D/g, "").slice(0, 11);
 });
-
 
 // ============================================================
 // HIDE SECTION FIELD FOR NON-STUDENTS
@@ -69,7 +67,6 @@ document.getElementById("grade_level").addEventListener("change", function () {
         sectionGroup.style.display = "block";
     }
 });
-
 
 // ============================================================
 // REGISTRATION FORM SUBMIT
@@ -99,7 +96,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     if (data.grade_level === "Faculty") data.member_type = "Faculty";
     if (data.grade_level === "Community") data.member_type = "Community";
 
-    // Validation
     if (!data.first_name || !data.last_name) {
         showToast("Please enter your full name", "error");
         return;
@@ -176,9 +172,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }
 });
 
-
 // ============================================================
-// OTP DIGIT INPUTS — AUTO-JUMP, PASTE, ETC.
+// OTP DIGIT INPUTS
 // ============================================================
 const digitInputs = document.querySelectorAll(".code-digit");
 
@@ -194,7 +189,6 @@ digitInputs.forEach((input, index) => {
                 setTimeout(() => tryAutoVerify(), 100);
             }
         }
-
         updateDigitStyles();
     });
 
@@ -210,9 +204,7 @@ digitInputs.forEach((input, index) => {
         }
     });
 
-    input.addEventListener("focus", function () {
-        this.select();
-    });
+    input.addEventListener("focus", function () { this.select(); });
 
     input.addEventListener("paste", function (e) {
         e.preventDefault();
@@ -220,28 +212,21 @@ digitInputs.forEach((input, index) => {
         const digits = pasted.replace(/\D/g, "").slice(0, 6).split("");
 
         digits.forEach((digit, i) => {
-            if (digitInputs[i]) {
-                digitInputs[i].value = digit;
-            }
+            if (digitInputs[i]) digitInputs[i].value = digit;
         });
 
         const lastIndex = Math.min(digits.length, 5);
         digitInputs[lastIndex].focus();
         updateDigitStyles();
 
-        if (digits.length === 6) {
-            setTimeout(() => tryAutoVerify(), 100);
-        }
+        if (digits.length === 6) setTimeout(() => tryAutoVerify(), 100);
     });
 });
 
 function updateDigitStyles() {
     digitInputs.forEach(inp => {
-        if (inp.value) {
-            inp.classList.add("filled");
-        } else {
-            inp.classList.remove("filled");
-        }
+        if (inp.value) inp.classList.add("filled");
+        else inp.classList.remove("filled");
         inp.classList.remove("error", "success");
     });
 }
@@ -258,28 +243,15 @@ function clearDigits() {
     if (digitInputs[0]) digitInputs[0].focus();
 }
 
-function showDigitError() {
-    digitInputs.forEach(inp => inp.classList.add("error"));
-}
+function showDigitError() { digitInputs.forEach(inp => inp.classList.add("error")); }
+function showDigitSuccess() { digitInputs.forEach(inp => inp.classList.add("success")); }
 
-function showDigitSuccess() {
-    digitInputs.forEach(inp => inp.classList.add("success"));
-}
-
-
-// ============================================================
-// AUTO-VERIFY
-// ============================================================
 function tryAutoVerify() {
-    const code = getEnteredCode();
-    if (code.length === 6) {
-        verifyCode();
-    }
+    if (getEnteredCode().length === 6) verifyCode();
 }
 
-
 // ============================================================
-// COUNTDOWN TIMER
+// COUNTDOWN TIMER & RESEND
 // ============================================================
 function startTimer() {
     clearInterval(timerInterval);
@@ -293,10 +265,7 @@ function startTimer() {
     timerInterval = setInterval(() => {
         countdownSeconds--;
         updateTimerDisplay();
-
-        if (countdownSeconds <= 0) {
-            clearInterval(timerInterval);
-        }
+        if (countdownSeconds <= 0) clearInterval(timerInterval);
     }, 1000);
 }
 
@@ -315,15 +284,9 @@ function updateTimerDisplay() {
     const secs = countdownSeconds % 60;
     timerEl.textContent = `${mins}:${secs.toString().padStart(2, "0")}`;
 
-    if (countdownSeconds <= 60 && timerBox) {
-        timerBox.classList.add("expired");
-    }
+    if (countdownSeconds <= 60 && timerBox) timerBox.classList.add("expired");
 }
 
-
-// ============================================================
-// RESEND CODE
-// ============================================================
 async function resendCode() {
     const btn = document.getElementById("resendBtn");
     const text = document.getElementById("resendText");
@@ -341,7 +304,6 @@ async function resendCode() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: registeredEmail }),
         });
-
         const result = await response.json();
 
         if (result.success) {
@@ -371,7 +333,6 @@ function startResendCooldown(seconds) {
     const interval = setInterval(() => {
         resendSeconds--;
         text.textContent = `Resend in ${resendSeconds}s`;
-
         if (resendSeconds <= 0) {
             clearInterval(interval);
             btn.disabled = false;
@@ -380,10 +341,6 @@ function startResendCooldown(seconds) {
     }, 1000);
 }
 
-
-// ============================================================
-// VERIFY CODE
-// ============================================================
 async function verifyCode() {
     const code = getEnteredCode();
     const errorEl = document.getElementById("verifyError");
@@ -391,7 +348,6 @@ async function verifyCode() {
     const btnText = btn.querySelector(".btn-text");
 
     errorEl.textContent = "";
-
     if (!code || code.length !== 6) {
         errorEl.textContent = "Please enter all 6 digits";
         showDigitError();
@@ -407,7 +363,6 @@ async function verifyCode() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: registeredEmail, code: code }),
         });
-
         const result = await response.json();
 
         if (result.success) {
@@ -416,19 +371,13 @@ async function verifyCode() {
                 title: "Verified!",
                 duration: 4000,
             });
-
-            setTimeout(() => {
-                window.location.href = "/member-login";
-            }, 2500);
+            setTimeout(() => { window.location.href = "/member-login"; }, 2500);
         } else {
             errorEl.textContent = result.error || "Invalid code";
             showDigitError();
             btn.disabled = false;
             if (btnText) btnText.textContent = "Verify Account";
-
-            setTimeout(() => {
-                digitInputs.forEach(inp => inp.classList.remove("error"));
-            }, 2000);
+            setTimeout(() => { digitInputs.forEach(inp => inp.classList.remove("error")); }, 2000);
         }
     } catch (err) {
         errorEl.textContent = "Connection error";
@@ -437,10 +386,6 @@ async function verifyCode() {
     }
 }
 
-
-// ============================================================
-// MODAL CONTROLS
-// ============================================================
 function closeVerifyModal() {
     document.getElementById("verifyModal").classList.remove("active");
     clearInterval(timerInterval);

@@ -11,8 +11,13 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 def get_connection():
     """Get a database connection."""
-    conn = sqlite3.connect(DB_PATH)
+    # timeout=20 tells SQLite to wait 20 seconds before giving up if busy
+    # check_same_thread=False is REQUIRED for Flask/gunicorn servers
+    conn = sqlite3.connect(DB_PATH, timeout=20, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    
+    # Enable WAL mode so reading and writing can happen at the same time
+    conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 

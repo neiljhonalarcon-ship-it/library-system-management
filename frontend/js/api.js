@@ -50,7 +50,6 @@ async function apiDelete(url) {
 // LOGOUT — With Confirmation Modal
 // ============================================================
 function logout() {
-    // Build confirmation modal HTML
     const modalHTML = `
         <div class="logout-confirm-overlay" id="logoutConfirmOverlay">
             <div class="logout-confirm-modal">
@@ -71,14 +70,11 @@ function logout() {
         </div>
     `;
 
-    // Remove any existing modal
     const existing = document.getElementById("logoutConfirmOverlay");
     if (existing) existing.remove();
 
-    // Add to body
     document.body.insertAdjacentHTML("beforeend", modalHTML);
 
-    // Close on overlay click
     setTimeout(() => {
         const overlay = document.getElementById("logoutConfirmOverlay");
         if (overlay) {
@@ -88,7 +84,6 @@ function logout() {
         }
     }, 0);
 
-    // Close on ESC
     document.addEventListener("keydown", function escHandler(e) {
         if (e.key === "Escape") {
             closeLogoutConfirm();
@@ -127,10 +122,8 @@ function formatDate(dateStr) {
     });
 }
 
-
 // ============================================================
 // UNIVERSAL CONFIRM MODAL
-// Beautiful replacement for browser's confirm()
 // ============================================================
 function showConfirm(options) {
     return new Promise((resolve) => {
@@ -139,11 +132,10 @@ function showConfirm(options) {
             message = "This action cannot be undone.",
             confirmText = "Confirm",
             cancelText = "Cancel",
-            type = "warning",  // warning, danger, success, info
+            type = "warning", 
             icon = null,
         } = options;
 
-        // Icon SVGs per type
         const iconSvgs = {
             warning: `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>`,
             danger: `<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>`,
@@ -169,7 +161,6 @@ function showConfirm(options) {
             </div>
         `;
 
-        // Remove any existing modal
         const existing = document.getElementById("confirmModalOverlay");
         if (existing) existing.remove();
 
@@ -179,7 +170,6 @@ function showConfirm(options) {
         const btnYes = document.getElementById("confirmBtnYes");
         const btnCancel = document.getElementById("confirmBtnCancel");
 
-        // Handlers
         function close(result) {
             overlay.classList.add("closing");
             setTimeout(() => {
@@ -191,12 +181,10 @@ function showConfirm(options) {
         btnYes.addEventListener("click", () => close(true));
         btnCancel.addEventListener("click", () => close(false));
 
-        // Close on overlay click (treat as cancel)
         overlay.addEventListener("click", function (e) {
             if (e.target === this) close(false);
         });
 
-        // ESC key closes
         const escHandler = (e) => {
             if (e.key === "Escape") {
                 close(false);
@@ -205,7 +193,6 @@ function showConfirm(options) {
         };
         document.addEventListener("keydown", escHandler);
 
-        // Focus the Yes button
         setTimeout(() => btnYes.focus(), 100);
     });
 }
@@ -219,3 +206,155 @@ function escapeHtmlConfirm(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// ============================================================
+// GLOBAL BADGES (Auto-Runs on all pages)
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+    
+       // ========================================================
+    // 1. CHECK RESERVATIONS BADGE (Color Coded Bell Icon)
+    // ========================================================
+    const resBadge = document.getElementById("pendingReservationsBadge");
+    if (resBadge) {
+        fetch("/api/admin/reservation-stats")
+            .then(res => res.status === 401 ? null : res.json())
+            .then(data => {
+                if (!data) return;
+                
+                const pendingCount = data.pending || 0;
+                const readyCount = data.ready || 0;
+                
+                // 🚨 TOTAL ACTIONABLE = Pending + Ready lang. WALANG Completed at Cancelled.
+                const totalActionable = pendingCount + readyCount;
+
+                if (totalActionable > 0) {
+                    resBadge.style.setProperty("display", "flex", "important");
+                    
+                    // Kung may Ready, Green. Kung puro Pending, Orange.
+                    if (readyCount > 0) {
+                        resBadge.className = "badge badge-ready"; 
+                    } else {
+                        resBadge.className = "badge badge-pending"; 
+                    }
+
+                    resBadge.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg> 
+                        <span>${totalActionable}</span>
+                    `;
+                } 
+                // Wala nang active na kailangan ng aksyon, itago.
+                else {
+                    resBadge.style.setProperty("display", "none", "important");
+                }
+            }).catch(err => console.error(err));
+    }
+
+    // ========================================================
+    // 2. CHECK APPROVALS BADGE (Standard Red Number)
+    // ========================================================
+    const appBadge = document.getElementById("pendingBadge");
+    const appBadgeAlt = document.getElementById("pendingCount");
+    
+    if (appBadge || appBadgeAlt) {
+        fetch("/api/admin/pending-members")
+            .then(res => res.status === 401 ? null : res.json())
+            .then(data => {
+                const count = data ? data.length : 0;
+                const targetBadge = appBadge || appBadgeAlt;
+                
+                if (count > 0) {
+                    targetBadge.textContent = count;
+                    targetBadge.style.setProperty("display", "inline-block", "important");
+                } else {
+                    targetBadge.style.setProperty("display", "none", "important");
+                }
+            }).catch(err => console.error(err));
+    }
+});
+
+// ============================================================
+// 🚨 ADMIN GLOBAL NOTIFICATION BELL & TRASH BADGE
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+    const adminBellContainer = document.getElementById("adminBellContainer");
+    
+    // Kung wala tayong Admin Bell sa page, skip
+    if (!adminBellContainer) return;
+
+    // --- 1. FETCH AND UPDATE NOTIFICATIONS ---
+    function fetchAdminNotifs() {
+        Promise.all([
+            fetch("/api/admin/reservation-stats").then(r => r.json()),
+            fetch("/api/admin/trash").then(r => r.json())
+        ]).then(([stats, trash]) => {
+            const badge = document.getElementById("admin-bell-badge");
+            const dropdown = document.getElementById("admin-notif-dropdown");
+            
+            const pendingCount = stats.pending || 0;
+            const readyCount = stats.ready || 0;
+            const trashCount = (trash.books?.length || 0) + (trash.members?.length || 0);
+
+            const totalNotifs = pendingCount + readyCount + trashCount;
+
+            // 🚨 UPDATE BELL BADGE
+            if (badge) {
+                if (totalNotifs > 0) {
+                    badge.style.display = "flex";
+                    badge.textContent = totalNotifs;
+                } else {
+                    badge.style.display = "none";
+                }
+            }
+
+            // 🚨 UPDATE SIDEBAR TRASH BADGE (Bagong dagdag)
+            const trashBadge = document.getElementById("trashCountBadge");
+            if (trashBadge) {
+                if (trashCount > 0) {
+                    trashBadge.textContent = trashCount;
+                    trashBadge.style.display = "inline-block";
+                } else {
+                    trashBadge.style.display = "none";
+                }
+            }
+
+            // 🚨 UPDATE DROPDOWN CONTENTS
+            if (dropdown) {
+                if (totalNotifs > 0) {
+                    let notifHTML = "";
+                    if (readyCount > 0) notifHTML += `<div class="notif-item" onclick="window.location.href='/admin/reservations'"><div class="notif-icon">✅</div><div class="notif-content"><p>${readyCount} reservation(s) READY for pickup!</p></div></div>`;
+                    if (pendingCount > 0) notifHTML += `<div class="notif-item" onclick="window.location.href='/admin/reservations'"><div class="notif-icon">⏳</div><div class="notif-content"><p>${pendingCount} new reservation(s) pending.</p></div></div>`;
+                    if (trashCount > 0) notifHTML += `<div class="notif-item" onclick="window.location.href='/admin/trash'"><div class="notif-icon" style="color:#ef4444;">🗑️</div><div class="notif-content"><p>You have ${trashCount} item(s) in the Trash.</p></div></div>`;
+                    dropdown.innerHTML = notifHTML;
+                } else {
+                    dropdown.innerHTML = `<div style="padding: 15px; text-align: center; color: #64748b; font-size: 13px;">No new notifications</div>`;
+                }
+            }
+        }).catch(err => console.error("Notification Error:", err));
+    }
+
+    fetchAdminNotifs();
+    setInterval(fetchAdminNotifs, 10000); // Refresh every 10s
+
+    // --- 2. 🚨 ITO YUNG NAKALIMUTAN KO: CLICK LISTENERS ---
+    const bellBtn = document.getElementById("admin-bell-btn");
+    const dropdown = document.getElementById("admin-notif-dropdown");
+    
+    if (bellBtn && dropdown) {
+        // Pag clinick yung bell, i-toggle yung dropdown
+        bellBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle("show");
+        });
+
+        // Pag clinick sa labas, isara yung dropdown
+        window.addEventListener("click", function(e) {
+            if (dropdown.classList.contains("show") && !bellBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    }
+});

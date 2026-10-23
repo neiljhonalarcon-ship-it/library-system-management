@@ -4,6 +4,7 @@
 
 let allReservations = [];
 let currentFilter = "";
+let currentStats = { pending: 0, ready: 0, completed: 0, cancelled: 0 };
 
 // ============================================================
 // INIT
@@ -15,28 +16,69 @@ async function loadAll() {
 }
 
 // ============================================================
-// LOAD STATS
+// LOAD STATS & FILTER BADGES (WITH READ RECEIPTS)
 // ============================================================
 async function loadStats() {
     try {
         const stats = await apiGet("/api/admin/reservation-stats");
         if (!stats) return;
 
-        animateNumber("statPending", stats.pending);
-        animateNumber("statReady", stats.ready);
-        animateNumber("statCompleted", stats.completed);
-        animateNumber("statCancelled", stats.cancelled);
+        currentStats = stats;
 
-        // Update sidebar badge
-        const badge = document.getElementById("pendingReservationsBadge");
-        if (badge) {
-            if (stats.pending > 0) {
-                badge.textContent = stats.pending;
-                badge.style.display = "inline-block";
+        // 1. Animate Top Cards (Total counts lang ito, palagi nating ipapakita)
+        animateNumber("statTotal", (stats.pending||0) + (stats.ready||0) + (stats.completed||0) + (stats.cancelled||0));
+        animateNumber("statPending", stats.pending || 0);
+        animateNumber("statReady", stats.ready || 0);
+        animateNumber("statCompleted", stats.completed || 0);
+        animateNumber("statCancelled", stats.cancelled || 0);
+
+        // 2. Update Sidebar Badge (Pending + Ready lang)
+        const sideBadge = document.getElementById("pendingReservationsBadge");
+        const actionable = (stats.pending || 0) + (stats.ready || 0);
+        if (sideBadge) {
+            if (actionable > 0) {
+                sideBadge.textContent = actionable;
+                sideBadge.style.display = "inline-block";
             } else {
-                badge.style.display = "none";
+                sideBadge.style.display = "none";
             }
         }
+
+        // 3. Update Filter Badges (Unread counts)
+        // Kunin kung ilan yung huling "nakita" ng admin
+        const seenCompleted = parseInt(localStorage.getItem('seen_completed') || '0');
+        const seenCancelled = parseInt(localStorage.getItem('seen_cancelled') || '0');
+
+        // Compute kung ilan yung bago (current - seen)
+        const newCompleted = Math.max(0, (stats.completed || 0) - seenCompleted);
+        const newCancelled = Math.max(0, (stats.cancelled || 0) - seenCancelled);
+
+        const badgePending = document.getElementById("badge-pending");
+        const badgeReady = document.getElementById("badge-ready");
+        const badgeCompleted = document.getElementById("badge-completed");
+        const badgeCancelled = document.getElementById("badge-cancelled");
+        const badgeAll = document.getElementById("badge-all");
+
+        if (badgeAll) badgeAll.style.display = "none"; // Walang badge sa All
+
+        function toggleBadge(el, count) {
+            if (!el) return;
+            if (count > 0) {
+                el.textContent = count;
+                el.style.display = "inline-block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        // Para sa Pending at Ready, laging total ang ipapakita (kasi need ng action)
+        toggleBadge(badgePending, stats.pending || 0);
+        toggleBadge(badgeReady, stats.ready || 0);
+        
+        // Para sa Completed at Cancelled, yung "NEW" lang ang ipapakita
+        toggleBadge(badgeCompleted, newCompleted);
+        toggleBadge(badgeCancelled, newCancelled);
+
     } catch (err) {
         console.error("Failed to load stats:", err);
     }
@@ -66,7 +108,7 @@ async function loadReservations() {
 }
 
 // ============================================================
-// FILTER
+// FILTER (With Read Receipt Logic)
 // ============================================================
 function filterReservations(status, el) {
     currentFilter = status;
@@ -74,11 +116,22 @@ function filterReservations(status, el) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     if (el) el.classList.add("active");
 
+    // 🚨 READ RECEIPT: Kapag clinick, itago yung badge at i-save sa localStorage
+    if (status === "Completed") {
+        localStorage.setItem('seen_completed', currentStats.completed);
+        const badge = document.getElementById("badge-completed");
+        if (badge) badge.style.display = "none";
+    } else if (status === "Cancelled") {
+        localStorage.setItem('seen_cancelled', currentStats.cancelled);
+        const badge = document.getElementById("badge-cancelled");
+        if (badge) badge.style.display = "none";
+    }
+
     loadReservations();
 }
 
 // ============================================================
-// RENDER
+// RENDER (Same as before)
 // ============================================================
 function renderReservations(reservations) {
     const content = document.getElementById("reservationsContent");
@@ -166,10 +219,6 @@ function renderReservations(reservations) {
                                 <span>${escapeHtml(r.member_email || "—")}</span>
                             </div>
                             <div class="res-detail-row">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                                <span>${escapeHtml(r.member_contact || "—")}</span>
-                            </div>
-                            <div class="res-detail-row">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 <span>Requested: <strong>${createdDate}</strong></span>
                             </div>
@@ -190,45 +239,19 @@ function renderReservations(reservations) {
 // ============================================================
 async function updateStatus(reservationId, newStatus) {
     const configs = {
-        "Ready": {
-            title: "Mark as Ready?",
-            message: "The book is prepared and ready for the member to pick up.",
-            confirmText: "Mark Ready",
-            type: "success",
-        },
-        "Completed": {
-            title: "Complete Pickup?",
-            message: "The member is picking up the book. This will create a borrow transaction and give them 14 days to return it.",
-            confirmText: "Yes, Complete",
-            type: "success",
-        },
-        "Cancelled": {
-            title: "Cancel Reservation?",
-            message: "This reservation will be cancelled and cannot be undone.",
-            confirmText: "Yes, Cancel",
-            type: "danger",
-        },
+        "Ready": { title: "Mark as Ready?", message: "The book is prepared and ready for the member to pick up.", confirmText: "Mark Ready", type: "success" },
+        "Completed": { title: "Complete Pickup?", message: "The member is picking up the book. This will create a borrow transaction and give them 14 days to return it.", confirmText: "Yes, Complete", type: "success" },
+        "Cancelled": { title: "Cancel Reservation?", message: "This reservation will be cancelled and cannot be undone.", confirmText: "Yes, Cancel", type: "danger" },
     };
 
-    const config = configs[newStatus] || {
-        title: `Change to ${newStatus}?`,
-        message: `Change this reservation's status to ${newStatus}?`,
-        confirmText: "Confirm",
-        type: "warning",
-    };
-
+    const config = configs[newStatus] || { title: `Change to ${newStatus}?`, message: `Change this reservation's status to ${newStatus}?`, confirmText: "Confirm", type: "warning" };
     const confirmed = await showConfirm(config);
     if (!confirmed) return;
 
     try {
-        const response = await apiPost(`/api/admin/reservation/${reservationId}/status`, {
-            status: newStatus,
-        });
-
+        const response = await apiPost(`/api/admin/reservation/${reservationId}/status`, { status: newStatus });
         if (response && response.success) {
-            showToast(response.message || `Status updated to ${newStatus}`, "success", {
-                title: newStatus === "Completed" ? "Book Picked Up!" : `Reservation ${newStatus}`,
-            });
+            showToast(response.message || `Status updated to ${newStatus}`, "success", { title: newStatus === "Completed" ? "Book Picked Up!" : `Reservation ${newStatus}` });
             await loadAll();
         } else {
             showToast(response?.error || "Failed to update", "error");
@@ -249,12 +272,7 @@ function getInitials(name) {
 
 function escapeHtml(str) {
     if (!str) return "";
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function animateNumber(elementId, target) {
@@ -262,7 +280,6 @@ function animateNumber(elementId, target) {
     if (!el) return;
     const duration = 800;
     const start = performance.now();
-
     function step(now) {
         const progress = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);

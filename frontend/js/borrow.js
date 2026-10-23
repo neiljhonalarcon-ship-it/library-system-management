@@ -62,7 +62,7 @@ function renderTransactions(transactions) {
             <tr class="${rowClass}">
                 <td><strong>#${t.transaction_id}</strong></td>
                 <td>${escapeHtml(t.member_name)}</td>
-                <td>${escapeHtml(t.book_title)}</td>
+                <td>${escapeHtml(t.book_title)} <span style="color: #64748b; font-size: 12px;">(Copy #${t.copy_number || 1})</span></td>
                 <td>${formatDate(t.borrow_date)}</td>
                 <td>${formatDate(t.due_date)}</td>
                 <td>
@@ -208,7 +208,14 @@ async function processReturn() {
         return;
     }
 
-    if (!confirm(`Return "${tx.book_title}" from ${tx.member_name}?`)) return;
+    const confirmed = await showConfirm({
+        title: "Return Book?",
+        message: `Are you sure you want to return "${tx.book_title}" from ${tx.member_name}?`,
+        confirmText: "Yes, Return",
+        cancelText: "Cancel",
+        type: "warning"
+    });
+    if (!confirmed) return;
 
     try {
         const result = await apiPost(`/api/return/${tid}`, {});
